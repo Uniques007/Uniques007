@@ -1,0 +1,47 @@
+#include <stdio.h>
+
+int main(){
+    int n;
+    int regionone=0;
+    int regiontwo=0;
+    int regionthree=0;
+    int regionfour=0;
+
+    scanf("%d",&n);
+    if(n%2==0){
+        printf("Enter odd number");
+    }
+    else{
+
+        int matrix[n][n];
+        for (int i=0;i<n;i++) {
+        for(int j=0;j<n;j++){
+            scanf("%d",&matrix[i][j]);
+        }
+        }
+        for (int i=0;i<n;i++) {
+        for(int j=0;j<n;j++){
+
+            if(i<n/2 && j<n/2){ // gore levo
+                regionone+=matrix[i][j];
+            }
+            if(i<n/2 && j>n/2){    //gore desno
+                regiontwo+=matrix[i][j];
+            }
+            if(i>n/2 && j<n/2){     //dolu levo
+                regionthree+=matrix[i][j];
+            }
+            if(i>n/2 && j>n/2){    //dolu desno
+                regionfour+=matrix[i][j];
+            }
+
+        }
+        }
+        printf("%d   %d \n",regionone,regiontwo);
+        printf("%d  %d",regionthree,regionfour);
+    }
+
+
+
+    return 0;
+}
