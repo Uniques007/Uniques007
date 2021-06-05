@@ -1,0 +1,58 @@
+#include <stdio.h>
+
+int main()
+{
+      int n;
+   scanf("%d",&n);
+   int matrix[n][n];
+for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+        scanf("%d",&matrix[i][j]);
+    }
+}
+
+        int important=0;
+        int second=0;
+        int firstcolumn=0;
+        int lastcolumn=0;
+
+for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+
+        if(i==j){
+            important+=matrix[i][j];
+        }
+         if(i+j==n-1){
+            second+=matrix[i][j];
+        }
+         if(j==0){
+            firstcolumn+=matrix[i][j];
+        }
+         if(j==n-1){
+            lastcolumn+=matrix[i][j];
+        }
+    }
+}
+printf("%d\n",important-second);
+printf("%d\n",firstcolumn-lastcolumn);
+
+    return 0;
+}
+/*
+  shorth path------>
+for(int i=0;i<n;i++){
+
+
+        //glavna dijagonala
+            important+=matrix[i][i];
+
+         //sporedna dijagonala
+            second+=matrix[i][n-1-i];
+
+         //prva kolona
+
+            firstcolumn+=matrix[i][0];
+
+         //posledna kolona
+            lastcolumn+=matrix[i][n-1];
+            */
