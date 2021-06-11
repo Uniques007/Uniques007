@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <ctype.h>
+
+
+int rekurzija(int broevi,int k){
+    if(broevi==0){
+        return 0;
+    }
+    int posledna=broevi%10;
+    if(posledna<=k){
+        posledna=0;
+    }
+   int s= rekurzija(broevi/10,k)+posledna;
+    if(posledna>k){
+        printf("%d",posledna);
+    }
+    return s;
+}
+
+
+int main(){
+
+    int k,n,broevi;
+    scanf("%d %d",&k,&n);
+    int matrix[n];
+     for(int i=0;i<n;i++){
+         scanf("%d",&matrix[i]);
+
+     }
+
+     for(int i=0;i<n;i++){
+            int r=rekurzija(matrix[i],k);
+         printf( ": %d\n",r);
+     }
+
+    return 0;
+}
