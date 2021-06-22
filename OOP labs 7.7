@@ -1,0 +1,230 @@
+#include <iostream>
+#include <string.h>
+#include <math.h>
+#include<stdio.h>
+
+using namespace std;
+
+
+
+
+class Secret{
+    public:
+      virtual double simpleEntropy()=0;
+      virtual int total()=0;
+
+
+};
+
+
+
+class DigitSecret : public Secret {
+    private:
+      int integers[100];
+      int n;
+    public:
+    DigitSecret(){
+        integers[0];
+        n=0;
+    }
+
+    DigitSecret(int integers_[],int _n){
+        n=_n;
+        for(int i=0;i<n;i++){
+            integers[i]=integers_[i];
+        }
+    }
+    int total(){
+        return n;
+    }
+
+    double simpleEntropy(){
+        int count=0;
+        int total=0;
+        for(int i=0;i<n;i++){
+            count=0;
+            for(int j=0;j<n;j++){
+                if(integers[i]==integers[j]){
+                    count++;
+                }
+                if(count==1){
+                    total++;
+                }
+            }
+        }
+        return  total/ n;
+    }
+
+     friend ostream &operator <<(ostream &out,DigitSecret &d){
+        for(int i=0;i<d.n;i++){
+            out<<d.integers[i];
+        }
+
+        out<<" Simple entropy: "<<d.simpleEntropy()<<" Total: "<<d.total();
+    }
+
+
+
+};
+
+class CharSecret : public Secret {
+    private:
+    char characters[100];
+
+
+    public:
+    CharSecret(){
+        strcpy(characters,"");
+    }
+
+    CharSecret(char *characters){
+        strcpy(characters,characters);
+    }
+
+    int  total(){
+        return strlen(characters);
+
+    }
+    double simpleEntropy(){
+
+        int total=0;
+        for(int i=0;i<strlen(characters);i++){
+            int count=0;
+            for(int j=0;j<strlen(characters);j++){
+                if(characters[i]=characters[j]){
+                    count++;
+                }
+                if(count==1){
+                    total++;
+                }
+    }
+        }
+        return total/  strlen (characters);
+    }
+
+    friend ostream &operator <<(ostream &out,CharSecret &c){
+        out<<c.characters;
+        out<<" Simple entropy: "<<c.simpleEntropy()<<" Total: "<<c.total();
+    }
+
+
+};
+bool operator ==(Secret &s,Secret &s1){
+    return ((s.simpleEntropy() == s1.simpleEntropy()) && (s.total() == s1.total()));
+}
+bool operator !=(Secret &s,Secret &s1){
+    return !((s.simpleEntropy()==s1.simpleEntropy())&& (s.total()==s1.total()));
+}
+
+
+void process(Secret ** secrets, int n){
+    int max=-2000000000;
+    int index=-1;
+    for(int i=1;i<n;i++){
+        if(secrets[i]->simpleEntropy()>max){
+            max=secrets[i]->simpleEntropy();
+            index=i;
+        }
+        DigitSecret *di=dynamic_cast<DigitSecret*>(secrets[index]);
+        if(di!=0){
+            cout<<*di<<endl;
+        }
+        CharSecret *chart=dynamic_cast<CharSecret*>(secrets[index]);
+        if(chart!=0){
+            cout<<*chart<<endl;
+        }
+    }
+}
+
+void printAll (Secret ** secrets, int n) {
+    for(int i=0;i<n;i++){
+
+         DigitSecret *di=dynamic_cast<DigitSecret*>(secrets[i]);
+         if(di!=0){
+             cout<<*di<<endl;
+         }
+         CharSecret *chart=dynamic_cast<CharSecret*>(secrets[i]);
+        if(chart!=0){
+            cout<<*chart<<endl;
+        }
+    }
+
+
+}
+
+
+
+
+
+
+int main() {
+    int n;
+    cin >> n;
+    if(n == 0) {
+		cout << "Constructors" << endl;
+		int numbers [] = {1,2,3,4,5};
+        DigitSecret ds(numbers,5);
+        CharSecret cs("abcabc");
+        cout << "OK" << endl;
+    } else if(n == 1) {
+  		cout << "operator <<" << endl;
+		int numbers [] = {1,2,3,4,5};
+        DigitSecret ds(numbers,5);
+        CharSecret cs("abcabc");
+        cout << ds << endl;
+        cout << cs << endl;
+    }  else if(n == 2) {
+  		cout << "== and !=" << endl;
+		int numbers [] = {1,2,3,4,5};
+        DigitSecret ds(numbers,5);
+        CharSecret cs("abcabc");
+        CharSecret css("abcabc");
+        cout << (ds == cs) << endl;
+        cout << (cs != ds) << endl;
+        cout << (cs == css) << endl;
+        cout << (cs != css) << endl;
+    } else if(n == 3) {
+  		cout << "Secret processor" << endl;
+		int numbers1 [] = {1,2,3,4,5,6,4,3,2,1,1,2,3,4,5};
+        DigitSecret ds1(numbers1,15);
+		int numbers2 [] = {1,2,3,4,5,0,0,0,5,5,4,4,3,3,2};
+        DigitSecret ds2(numbers2,15);
+		int numbers3 [] = {1,0,9,4,3,8,4,0,9,3,1,4,3,2,1,4,4,3,7,2};
+        DigitSecret ds3(numbers3,20);
+        CharSecret cs1("fhdaieowujkfjdsafjdsakjhueiqoyroq");
+        CharSecret cs2("nvzcfsadrqipqhfjdfncxoqw");
+        CharSecret cs3("uyoihfdsanmqeqrzvdhfeqyrq");
+        Secret** s = new Secret*[6];
+        s[0] = &ds1;
+        s[1] = &ds2;
+        s[2] = &ds3;
+        s[3] = &cs1;
+        s[4] = &cs2;
+        s[5] = &cs3;
+        process(s,6);
+        delete [] s;
+    }
+    else if (n==4){
+        cout << "Print all secrets" << endl;
+		int numbers1 [] = {1,2,3,4,5,5,4,3,2,1,1,2,3,4,5};
+        DigitSecret ds1(numbers1,15);
+		int numbers2 [] = {1,2,3,4,5,0,0,0,5,5,4,4,3,3,2};
+        DigitSecret ds2(numbers2,15);
+		int numbers3 [] = {1,0,9,4,3,8,4,0,9,3,1,4,3,2,1,4,4,3,7,2};
+        DigitSecret ds3(numbers3,20);
+        CharSecret cs1("fhdaieowujkfjdsafjdsakjhueiqoyroq");
+        CharSecret cs2("nvzcfsadrqipqhfjdfncxoqw");
+        CharSecret cs3("uyoihfdsanmqeqrzvdhfeqyrq");
+        Secret** s = new Secret*[6];
+        s[0] = &ds1;
+        s[1] = &ds2;
+        s[2] = &ds3;
+        s[3] = &cs1;
+        s[4] = &cs2;
+        s[5] = &cs3;
+        printAll(s,6);
+        delete [] s;
+    }
+
+    return 0;
+}
