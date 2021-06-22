@@ -1,0 +1,298 @@
+#include<iostream>
+#include<cstring>
+#include<cmath>
+
+using namespace std;
+
+
+class ArithmeticException{ //thorw 1
+     
+    public:
+     
+     void message(){
+     cout<<"Division by zero is not allowed"<<endl;
+     }
+    
+};
+
+
+class NumbersNotDivisibleException{  //thorw 2
+    protected:
+     int number;
+    public:
+     NumbersNotDivisibleException(int n){
+         number=n;
+     }
+     void message(){
+         cout<<"Division by "<<number<<" is not supported"<<endl;
+     }
+    
+}; 
+
+class ArrayFullException{ //thorw 3
+  public:
+   void message(){
+       cout<<"The array is full. Increase the capacity"<<endl;
+   }
+    
+};
+
+
+
+class IndexOutOfBoundsException{ //thorw 4
+    protected:
+     int index;
+    public:
+     IndexOutOfBoundsException(int ind){
+         index=ind;
+     }
+     void message(){
+         cout<<"Index "<<index<<" is out of bounds"<<endl;
+     }
+    
+};
+class NumberIsNotPositiveException{ //thorw 5
+     protected:
+       int number;
+     public:
+      NumberIsNotPositiveException(int n){
+          number=n;
+      }
+      void message(){
+          cout<<"Number "<<number<<" is not positive integer"<<endl;
+      }
+ };
+
+ 
+
+
+class PositiveIntegers{
+  protected:    
+    int *niza;
+    int broj_elemnti;
+    int max_kapacitet;
+  public:
+     
+    
+    PositiveIntegers(int maxi=0){
+        max_kapacitet=maxi;
+        broj_elemnti=0;
+        niza=new int[0];
+    }
+    
+    PositiveIntegers( const PositiveIntegers & p){//copy
+        
+        broj_elemnti=p.broj_elemnti;
+        niza=new int[broj_elemnti];
+        for(int i=0;i<broj_elemnti;i++){
+            niza[i]=p.niza[i];
+        }
+        max_kapacitet=p.max_kapacitet;
+    }
+    
+    PositiveIntegers &operator =(const PositiveIntegers &p){
+        if(this!=&p){
+            delete [] niza;
+            broj_elemnti=p.broj_elemnti;
+            niza=new int[broj_elemnti];
+            for(int i=0;i<broj_elemnti;i++){
+                niza[i]=p.niza[i];
+            }
+            max_kapacitet=p.max_kapacitet;
+        }
+        return *this;
+    }
+    ~PositiveIntegers(){
+        delete [] niza;
+    }
+    PositiveIntegers &operator +=(int number){
+        if(broj_elemnti==max_kapacitet){
+            throw ArrayFullException();
+        }
+        
+        if(number<=0){
+            throw NumberIsNotPositiveException(number);
+        }
+        
+        int  *temp=new int [broj_elemnti+1];
+        for(int i=0;i<broj_elemnti;i++){
+            temp[i]=niza[i];
+        }
+        temp[broj_elemnti++]=number;
+        delete [] niza;
+        niza=temp;
+        return *this;
+    }
+    
+    
+     void increaseCapacity(int c){
+         max_kapacitet+=c;
+     }
+     PositiveIntegers operator *(int number){
+         PositiveIntegers pi(*this);
+         for(int i=0;i<broj_elemnti;i++){
+             pi.niza[i]*=number;
+         }
+         return pi;
+     }
+     PositiveIntegers operator /(int number){   
+         if(number ==0){
+            throw ArithmeticException();
+         }
+         
+         for(int i=0;i<broj_elemnti;i++){
+             if(niza[i]%number!=0){
+                 throw NumbersNotDivisibleException(number);
+             }
+         }
+         PositiveIntegers pi(*this);
+         for(int i=0;i<broj_elemnti;i++){
+             pi.niza[i]/=number;
+         }
+         return pi;
+        
+     }
+     int  &operator[](int index){
+         if(index < 0 || index > broj_elemnti){
+             throw IndexOutOfBoundsException(index);
+         }
+         return niza[index];
+     }
+      void print()
+    {
+        cout<<"Size: "<<broj_elemnti<<" Capacity: "<<max_kapacitet<<" Numbers: ";
+        for (int i=0;i<broj_elemnti;i++)
+            cout<<niza[i]<<" ";
+        cout<<endl;
+    }
+};
+
+
+int main ()
+{
+int n,capacity;
+    cin >> n >> capacity;
+    PositiveIntegers pi (capacity);
+    for (int i=0;i<n;i++){
+        int number;
+        cin>>number;
+        try{
+        pi+=number;
+        }
+        catch(ArrayFullException &a)
+        {
+            a.message();
+        }
+        catch(NumberIsNotPositiveException & n)
+        {
+            n.message();
+        }
+ 
+    }
+    cout<<"===FIRST ATTEMPT TO ADD NUMBERS==="<<endl;
+    pi.print();
+    int incCapacity;
+    cin>>incCapacity;
+    pi.increaseCapacity(incCapacity);
+    cout<<"===INCREASING CAPACITY==="<<endl;
+    pi.print();
+ 
+    int n1;
+    cin>>n1;
+    for (int i=0;i<n1;i++){
+        int number;
+        cin>>number;
+        try{
+        pi+=number;
+        }
+        catch(ArrayFullException &a)
+        {
+            a.message();
+        }
+        catch(NumberIsNotPositiveException & n)
+        {
+            n.message();
+        }
+    }
+    cout<<"===SECOND ATTEMPT TO ADD NUMBERS==="<<endl;
+ 
+    pi.print();
+    PositiveIntegers pi1;
+ 
+    cout<<"===TESTING DIVISION==="<<endl;
+    try{
+    pi1 = pi/0;
+    pi1.print();
+    }
+    catch(ArithmeticException &ar)
+    {
+        ar.message();
+    }
+    catch(NumbersNotDivisibleException &nn)
+    {
+        nn.message();
+    }
+ 
+    try{
+    pi1 = pi/1;
+    pi1.print();
+    }
+    catch(ArithmeticException &ar)
+    {
+        ar.message();
+    }
+    catch(NumbersNotDivisibleException &nn)
+    {
+        nn.message();
+    }
+ 
+    try{
+        pi1 = pi/2;
+        pi1.print();
+    }
+    catch(ArithmeticException &ar)
+    {
+        ar.message();
+    }
+    catch(NumbersNotDivisibleException &nn)
+    {
+        nn.message();
+    }
+    cout<<"===TESTING MULTIPLICATION==="<<endl;
+    pi1 = pi*3;
+    pi1.print();
+    cout<<"===TESTING [] ==="<<endl;
+    try{
+    cout<<"PositiveIntegers[-1] = "<<pi[-1]<<endl;
+    }
+    catch(IndexOutOfBoundsException &ie)
+    {
+        ie.message();
+    }
+    try{
+    cout<<"PositiveIntegers[2] = "<<pi[2]<<endl;
+    }
+    catch(IndexOutOfBoundsException &ie)
+    {
+        ie.message();
+    }
+    try{
+    cout<<"PositiveIntegers[3] = "<<pi[3]<<endl;
+    }
+    catch(IndexOutOfBoundsException &ie)
+    {
+        ie.message();
+    }
+    try{
+    cout<<"PositiveIntegers[12] = "<<pi[12]<<endl;
+    }
+    catch(IndexOutOfBoundsException &ie)
+    {
+        ie.message();
+    }
+ 
+ 
+ 
+ 
+    return 0;
+}
