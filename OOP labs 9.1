@@ -1,0 +1,321 @@
+#include<iostream>
+#include<cstring>
+#include<cmath>
+#include<cctype>
+using namespace std;
+
+
+
+class InvalidPassword{
+    protected:
+      char text[100];
+      
+    public:
+      InvalidPassword(char texts[]){
+          strcpy(text,texts);
+      }
+      
+      void message(){
+      cout<<text<<endl;
+      }
+};
+
+
+class InvalidEmail{
+    protected:
+      char text[50];
+      
+    public:
+     InvalidEmail(char texts[]){
+         strcpy(text,texts);
+         
+     }
+     void message(){
+         cout<<text<<endl;
+     }
+    
+};
+
+class MaximumSizeLimit
+{
+protected:
+    int number;
+public:
+    MaximumSizeLimit(int n)
+    {
+        number=n;
+    }
+    void message()
+    {
+        cout<<"You can't add more than "<<number<<" users."<<endl;
+    }
+};
+
+class User{
+  protected:
+    
+    char username[50];
+    char password[50];
+    char email[50];
+ 
+  public:
+    User(char usernames[],char passwords[],char emails[]){
+        strcpy(username,usernames);
+       setPassword(password);
+       seetEmail(email);
+    }
+     
+    
+    virtual double popularity()=0;
+    
+    void setPassword(char passwords[]){  // throw passwords
+        int countBigletter=0,countSmallletter=0, number=0;
+        for(int i=0;i<strlen(passwords);i++){
+            if(isupper(passwords[i])){
+                countBigletter++;
+            }
+            if(islower(passwords[i])){
+                countSmallletter++;
+            }
+            if(isdigit(passwords[i])){
+                number++;
+            }
+            
+        }
+        if(!countBigletter||!countSmallletter||!number){
+            throw InvalidPassword("Password is too weak.");
+        }
+        strcpy(password,passwords);
+    }
+    void seetEmail(char emails[]){   //thorw emails
+        int countMOnkey=0;
+         for(int i=0;i<strlen(emails);i++){
+            if(emails[i]=='@'){
+                countMOnkey++;
+            }
+            if(countMOnkey==0){
+                throw InvalidEmail("Mail is not valid.");
+            }
+         }
+        
+        
+    }
+    
+     
+    
+};
+
+class FacebookUser : public User{
+    protected:
+      
+      int broj_prijateli;
+      int broj_lajkovi;
+      int broj_komentari;
+    
+    public:
+      FacebookUser(char usernames[],char passwords[],char emails[],int brojprijateli,int brojlajkovi,int brojkomentari)
+      : User(usernames,passwords,emails){
+           
+           broj_prijateli=brojprijateli;
+           broj_lajkovi=brojlajkovi;
+           broj_komentari=brojkomentari;
+          
+      }
+      
+      double popularity(){
+          return broj_prijateli+(0.1*broj_lajkovi)+(0.5*broj_komentari);
+      }
+      
+};
+
+
+class TwitterUser : public User{
+    protected:
+     
+      int broj_sledaci;
+      int broj_tvitovi;
+    
+    public:
+      TwitterUser(char *usernames,char *passwords,char *emails,int brojsledaci,int brojtvitovi)
+      :User(usernames,passwords,emails){
+         
+          broj_sledaci=brojsledaci;
+          broj_tvitovi=brojtvitovi;
+     
+      }
+      
+      double popularity(){
+          return broj_sledaci+(broj_tvitovi*0.5);
+      }
+
+    
+};
+
+class SocialNetwork {
+    protected:
+    
+      User **niza;
+      int broj_korisnici;
+      int static max;
+    
+    public:
+        SocialNetwork(){             //default constructor
+            niza=new User*[broj_korisnici];
+            broj_korisnici=0;
+            
+        } 
+    
+      SocialNetwork(int brojkorisnici){       //constructor with parametars
+          
+          broj_korisnici=brojkorisnici;
+          niza=new User*[broj_korisnici];
+          for(int i=0;i<broj_korisnici;i++){
+              niza[i]=niza[i];
+          
+          }
+          
+      }
+      
+      SocialNetwork(const SocialNetwork &s){         //copy
+          broj_korisnici=s.broj_korisnici;
+          niza=new User*[broj_korisnici];
+          for(int i=0;i<broj_korisnici;i++){
+              niza[i]=s.niza[i];
+          }
+          
+      }
+      
+      SocialNetwork &operator=( const SocialNetwork &s){    //operator =
+         
+          if(this!=&s){
+              delete [] niza;
+               broj_korisnici=s.broj_korisnici;
+               niza=new User*[broj_korisnici];
+                for(int i=0;i<broj_korisnici;i++){
+                    niza[i]=s.niza[i];
+                }
+          }
+          return *this;
+          
+      }
+      
+      
+      SocialNetwork &operator +=(User *u){         //operator +=
+          
+          if(max==broj_korisnici){  
+              throw MaximumSizeLimit(max); //throw static number
+          }
+          
+          User **temp=new User*[broj_korisnici+1];
+            for(int i=0;i<broj_korisnici;i++){
+                 temp[i]=niza[i];
+             }  
+            
+             temp[broj_korisnici++]=u;
+             delete [] niza;
+             niza=temp;
+             return*this;
+              
+          }
+          
+     void static  changeMaximumSize(int number){
+         
+          SocialNetwork::max=number;
+     }
+      
+    double avgPopularity(){    
+     double average=0.0;
+     for(int i=0;i<broj_korisnici;i++){
+         average+=niza[i]->popularity();
+     }
+     return average/broj_korisnici;
+       }
+    
+};
+int SocialNetwork::max=5; //static vrednost
+
+  
+    
+
+
+int main() {
+
+  SocialNetwork network = SocialNetwork();
+    int n;
+    cin >> n;
+    char username[50];
+    char password[50];
+    char email[50];
+    int userType;
+    for (int i=0; i < n; ++i) {
+      cin >> username;
+      cin >> password;
+      cin >> email;
+      cin >> userType;
+      if (userType == 1) {
+        int friends;
+        int likes;
+        int comments;
+        cin >> friends >> likes >> comments;
+          
+      
+         try{
+        
+        User * u = new FacebookUser(username,password,email,friends,likes,comments);
+        network += u;
+         }
+         catch(InvalidPassword &p){
+             p.message();
+         }
+         catch(InvalidEmail &e){
+             e.message();
+         }
+         catch(MaximumSizeLimit &m){
+             m.message();
+         }
+      }
+      else {
+        int followers;
+        int tweets;
+        cin >> followers >> tweets;
+          
+        try{
+        User * u= new TwitterUser(username,password,email,followers,tweets);
+        network += u;
+        }
+        catch(InvalidPassword &p){
+             p.message();
+         }
+         catch(InvalidEmail &e){
+             e.message();
+         }
+         catch(MaximumSizeLimit &m){
+             m.message();
+         }
+      }
+
+    }
+    network.changeMaximumSize(6);
+    cin >> username;
+    cin >> password;
+    cin >> email;
+    int followers;
+    int tweets;
+    cin >> followers >> tweets;
+    
+   try{
+    User * u= new TwitterUser(username,password,email,followers,tweets);
+    network += u;
+   }
+    catch(InvalidPassword &p){
+             p.message();
+         }
+         catch(InvalidEmail &e){
+             e.message();
+         }
+         catch(MaximumSizeLimit &m){
+             m.message();
+         }
+    cout << network.avgPopularity();
+
+}
